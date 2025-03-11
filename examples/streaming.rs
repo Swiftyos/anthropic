@@ -1,3 +1,26 @@
+//! # Streaming Example
+//!
+//! This example demonstrates how to use the streaming API with Claude.
+//! It creates a conversation loop where the user can chat with the AI assistant,
+//! and the assistant's responses are streamed in real-time.
+//!
+//! ## Features
+//!
+//! - Initializes with a system-like message to set the assistant's behavior
+//! - Maintains conversation history for context
+//! - Streams responses in real-time for a more interactive experience
+//! - Simple command-line interface for user input
+//!
+//! ## Usage
+//!
+//! Run this example with:
+//!
+//! ```bash
+//! cargo run --example streaming
+//! ```
+//!
+//! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
+
 use anthropic::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 

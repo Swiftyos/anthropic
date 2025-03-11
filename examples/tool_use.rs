@@ -1,3 +1,25 @@
+//! # Tool Use Example
+//!
+//! This example demonstrates how to use Claude's tool use capabilities.
+//! It creates a calculator tool that Claude can use to perform basic arithmetic operations.
+//!
+//! ## Features
+//!
+//! - Defines a calculator tool with a JSON schema
+//! - Allows Claude to use the tool when appropriate
+//! - Maintains conversation history for context
+//! - Simple command-line interface for user input
+//!
+//! ## Usage
+//!
+//! Run this example with:
+//!
+//! ```bash
+//! cargo run --example tool_use
+//! ```
+//!
+//! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
+
 use anthropic::{messages::*, Credentials};
 use serde_json::json;
 use std::io::{stdin, stdout, Write};

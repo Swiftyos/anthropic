@@ -1,3 +1,24 @@
+//! # Message CLI Example
+//!
+//! This example demonstrates a simple command-line interface for interacting with Claude.
+//! It creates a conversation loop where the user can chat with the AI assistant.
+//!
+//! ## Features
+//!
+//! - Initializes with a system-like message to set the assistant's behavior
+//! - Maintains conversation history for context
+//! - Simple command-line interface for user input
+//!
+//! ## Usage
+//!
+//! Run this example with:
+//!
+//! ```bash
+//! cargo run --example message_cli
+//! ```
+//!
+//! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
+
 use anthropic::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
