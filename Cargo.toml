@@ -1,5 +1,5 @@
 [package]
-name = "anthropic"
+name = "anthropic-llm"
 version = "1.0.0"
 authors = ["Craig Swift <craigswift13@gmail.com>", "swiftyos"]
 edition = "2021"
