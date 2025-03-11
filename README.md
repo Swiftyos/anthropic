@@ -12,14 +12,11 @@ Follow these steps to start using the Anthropic Rust SDK in your project:
 
 ### 1. Installation
 
-Add the library to your project by including it in your `Cargo.toml`. Since this is an unofficial library, it is currently available as a Git dependency:
+Add the library to your project using Cargo:
 
-```toml
-[dependencies]
-anthropic = { git = "https://github.com/swiftyos/anthropic.git" }
+```sh
+cargo add anthropic-llm
 ```
-
-> **Tip**: If the library is published to [crates.io](https://crates.io) in the future, check there for the latest version and update your dependency accordingly.
 
 ### 2. Set Up Your API Key
 
