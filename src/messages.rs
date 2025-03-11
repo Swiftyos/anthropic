@@ -1,5 +1,5 @@
 //! # Messages API
-//! 
+//!
 //! This module provides a Rust interface to Anthropic's Messages API, which allows you to interact
 //! with Claude models in a conversational manner.
 //!
@@ -36,6 +36,8 @@
 //! }
 //! ```
 
+use crate::{anthropic_post, anthropic_request_stream, ApiResponseOrError, Credentials, Usage};
+use anyhow::Result;
 use derive_builder::Builder;
 use futures_util::StreamExt;
 use reqwest::Method;
@@ -43,9 +45,6 @@ use reqwest_eventsource::{CannotCloneRequestError, Event, EventSource};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
-use anyhow::Result;
-use crate::{anthropic_post, anthropic_request_stream, ApiResponseOrError, Credentials, Usage};
-
 
 /// Represents a full message response from the Anthropic API.
 ///
@@ -84,7 +83,11 @@ pub enum ResponseContentBlock {
     Text { text: String },
     /// A tool use request from the model
     #[serde(rename = "tool_use")]
-    ToolUse { id: String, name: String, input: Value },
+    ToolUse {
+        id: String,
+        name: String,
+        input: Value,
+    },
 }
 
 /// Streaming events from the Anthropic API.
@@ -105,7 +108,10 @@ pub enum StreamEvent {
     },
     /// Contains a delta (incremental update) to a content block
     #[serde(rename = "content_block_delta")]
-    ContentBlockDelta { index: u32, delta: ContentBlockDelta },
+    ContentBlockDelta {
+        index: u32,
+        delta: ContentBlockDelta,
+    },
     /// Indicates the end of a content block
     #[serde(rename = "content_block_stop")]
     ContentBlockStop { index: u32 },
@@ -140,7 +146,11 @@ pub enum ContentBlockStart {
     /// A text content block
     Text { text: String },
     /// A tool use request
-    ToolUse { id: String, name: String, input: Value },
+    ToolUse {
+        id: String,
+        name: String,
+        input: Value,
+    },
 }
 
 /// Incremental update to a content block in a streaming response.

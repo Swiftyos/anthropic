@@ -75,11 +75,12 @@ async fn main() {
         });
 
         // Send message request with streaming
-        let mut stream = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-            .credentials(credentials.clone())
-            .create_stream()
-            .await
-            .unwrap();
+        let mut stream =
+            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+                .credentials(credentials.clone())
+                .create_stream()
+                .await
+                .unwrap();
 
         // Print assistant's streaming response and store the text
         print!("\nAssistant: ");

@@ -1,5 +1,5 @@
 //! # Anthropic Rust SDK
-//! 
+//!
 //! An unofficial Rust library for interacting with the [Anthropic API](https://www.anthropic.com/api).
 //! This library provides an asynchronous interface to Anthropic's services, allowing Rust developers
 //! to seamlessly integrate Anthropic's AI capabilities into their applications.

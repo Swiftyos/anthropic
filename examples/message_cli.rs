@@ -70,11 +70,12 @@ async fn main() {
         });
 
         // Send message request
-        let response = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-            .credentials(credentials.clone())
-            .create()
-            .await
-            .unwrap();
+        let response =
+            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+                .credentials(credentials.clone())
+                .create()
+                .await
+                .unwrap();
 
         // Print assistant's response
         if let Some(content) = response.content.first() {

@@ -26,7 +26,6 @@ use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
 async fn main() {
-
     let credentials = Credentials::from_env();
 
     // Define a calculator tool
@@ -54,7 +53,8 @@ async fn main() {
     let mut messages = vec![Message {
         role: MessageRole::User,
         content: MessageContent::Text(
-            "You are a helpful AI assistant. Please calculate 15 + 27 using the calculator tool.".to_string(),
+            "You are a helpful AI assistant. Please calculate 15 + 27 using the calculator tool."
+                .to_string(),
         ),
     }];
 
@@ -98,13 +98,14 @@ async fn main() {
         });
 
         // Send message request with tool
-        let response = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-            .credentials(credentials.clone())
-            .tools(vec![calculator_tool.clone()])
-            .tool_choice(ToolChoice::Any)
-            .create()
-            .await
-            .unwrap();
+        let response =
+            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+                .credentials(credentials.clone())
+                .tools(vec![calculator_tool.clone()])
+                .tool_choice(ToolChoice::Any)
+                .create()
+                .await
+                .unwrap();
 
         // Print assistant's response and tool usage
         for content in response.content {

@@ -6,6 +6,8 @@ edition = "2021"
 description = "An unofficial Rust library for the Anthropic API."
 license = "MIT"
 keywords = ["ai", "machine-learning", "anthropic", "library"]
+homepage = "https://github.com/Swiftyos/anthropic"
+repository = "https://github.com/Swiftyos/anthropic"
 
 [dependencies]
 anyhow = "1.0"
