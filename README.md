@@ -33,7 +33,7 @@ The library will automatically load this key when you create a `Credentials` obj
 Here’s a simple example of sending a message to the Anthropic API and receiving a response:
 
 ```rust
-use anthropic::{messages::*, Credentials};
+use anthropic_llm::{messages::*, Credentials};
 
 #[tokio::main]
 async fn main() {
@@ -86,7 +86,7 @@ Detailed examples can be found in the [`examples` directory](https://github.com/
 This example demonstrates a basic conversation loop with the Anthropic API:
 
 ```rust
-use anthropic::{messages::*, Credentials};
+use anthropic_llm::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
@@ -146,7 +146,7 @@ async fn main() {
 This example shows how to use a calculator tool with the API:
 
 ```rust
-use anthropic::{messages::*, Credentials};
+use anthropic_llm::{messages::*, Credentials};
 use serde_json::json;
 
 #[tokio::main]

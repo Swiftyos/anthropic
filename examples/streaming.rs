@@ -21,7 +21,7 @@
 //!
 //! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
 
-use anthropic::{messages::*, Credentials};
+use anthropic_llm::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
 #[tokio::main]

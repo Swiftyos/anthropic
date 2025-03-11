@@ -1,6 +1,6 @@
 [package]
 name = "anthropic-llm"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Craig Swift <craigswift13@gmail.com>", "swiftyos"]
 edition = "2021"
 description = "An unofficial Rust library for the Anthropic API."
