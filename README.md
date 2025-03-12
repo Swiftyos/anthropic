@@ -15,7 +15,7 @@ Follow these steps to start using the Anthropic Rust SDK in your project:
 Add the library to your project using Cargo:
 
 ```sh
-cargo add anthropic-llm
+cargo add anthropic-api
 ```
 
 ### 2. Set Up Your API Key
