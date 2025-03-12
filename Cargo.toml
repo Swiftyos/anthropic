@@ -5,7 +5,7 @@ authors = ["Craig Swift <craigswift13@gmail.com>", "swiftyos"]
 edition = "2021"
 description = "An unofficial Rust library for the Anthropic API."
 license = "MIT"
-keywords = ["ai", "machine-learning", "anthropic", "library"]
+keywords = ["ai", "anthropic", "api", "async"]
 homepage = "https://github.com/Swiftyos/anthropic"
 repository = "https://github.com/Swiftyos/anthropic"
 
