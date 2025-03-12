@@ -1277,7 +1277,7 @@ mod tests {
                 .unwrap();
 
             // Just verify we got a response, may be empty if no members
-            assert!(members.data.len() >= 0);
+            assert!(!members.data.is_empty() || (members.data.is_empty() && !members.has_more));
         }
     }
 
