@@ -1,5 +1,10 @@
 # Anthropic Unofficial Rust SDK
 
+
+[![crates.io](https://img.shields.io/crates/v/anthropic-api.svg)](https://crates.io/crates/anthropic-api/)
+[![Rust workflow](https://github.com/swiftyos/anthropic/actions/workflows/test.yml/badge.svg)](https://github.com/swiftyos/anthropic/actions/workflows/test.yml)
+
+
 An unofficial Rust library for interacting with the [Anthropic API](https://www.anthropic.com/api). This library provides an asynchronous interface to Anthropic's services, allowing Rust developers to seamlessly integrate Anthropic's AI capabilities—such as message-based interactions and tool use—into their applications.
 
 > **Note**: This is an unofficial library and is not maintained by Anthropic.

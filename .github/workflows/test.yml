@@ -1,0 +1,33 @@
+name: Test
+on:
+  push:
+    branches: [ "master" ]
+  pull_request_target:
+    branches: [ "master" ]
+env:
+  CARGO_TERM_COLOR: always
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - name: Format check
+        run: cargo fmt --all -- --check
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests (native-tls)
+        run: cargo test --verbose
+      - name: Run tests (rustls)
+        run: cargo test --verbose --no-default-features --features=rustls
