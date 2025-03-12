@@ -13,7 +13,7 @@ repository = "https://github.com/Swiftyos/anthropic"
 anyhow = "1.0"
 derive_builder = "0.20.0"
 futures-util = "0.3"
-reqwest = { version = "0.11", default-features = false, features = ["json", "stream"], optional = true }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream"], optional = true }
 reqwest-eventsource = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0"
