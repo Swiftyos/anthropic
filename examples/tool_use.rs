@@ -20,9 +20,8 @@
 //!
 //! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
 
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 use serde_json::json;
-use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
 async fn main() {
@@ -50,16 +49,17 @@ async fn main() {
         }),
     };
 
+    let content =
+        "You are a helpful AI assistant. Please calculate 15 + 27 using the calculator tool.";
     let mut messages = vec![Message {
         role: MessageRole::User,
-        content: MessageContent::Text(
-            "You are a helpful AI assistant. Please calculate 15 + 27 using the calculator tool."
-                .to_string(),
-        ),
+        content: MessageContent::Text(content.to_string()),
     }];
 
+    println!("Claude: {}", content);
+
     // Create message request with tool
-    let response = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .tools(vec![calculator_tool.clone()])
         .tool_choice(ToolChoice::Any)
@@ -78,48 +78,7 @@ async fn main() {
                 });
             }
             ResponseContentBlock::ToolUse { name, input, .. } => {
-                println!("Tool use - {}: {}", name, input);
-            }
-        }
-    }
-
-    // Start conversation loop
-    loop {
-        print!("User: ");
-        stdout().flush().unwrap();
-
-        let mut user_input = String::new();
-        stdin().read_line(&mut user_input).unwrap();
-
-        // Add user message
-        messages.push(Message {
-            role: MessageRole::User,
-            content: MessageContent::Text(user_input),
-        });
-
-        // Send message request with tool
-        let response =
-            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-                .credentials(credentials.clone())
-                .tools(vec![calculator_tool.clone()])
-                .tool_choice(ToolChoice::Any)
-                .create()
-                .await
-                .unwrap();
-
-        // Print assistant's response and tool usage
-        for content in response.content {
-            match content {
-                ResponseContentBlock::Text { text } => {
-                    println!("Assistant: {}", text.trim());
-                    messages.push(Message {
-                        role: MessageRole::Assistant,
-                        content: MessageContent::Text(text),
-                    });
-                }
-                ResponseContentBlock::ToolUse { name, input, .. } => {
-                    println!("Tool use - {}: {}", name, input);
-                }
+                println!("Claude decided to use the tool: {}: {}", name, input);
             }
         }
     }

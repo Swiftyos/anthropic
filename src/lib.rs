@@ -14,7 +14,7 @@
 //! ## Basic Usage
 //!
 //! ```no_run
-//! use anthropic::{messages::*, Credentials};
+//! use anthropic_api::{messages::*, Credentials};
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -28,8 +28,8 @@
 //!     }];
 //!
 //!     // Send the message to the Anthropic API
-//!     let response = MessageResponse::builder("claude-3-sonnet-20240229", messages, 1024)
-//!         .credentials(credentials)
+//!     let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+//!         .credentials(credentials.clone())
 //!         .create()
 //!         .await
 //!         .unwrap();
@@ -48,8 +48,9 @@ use std::env;
 use std::env::VarError;
 use std::sync::{LazyLock, RwLock};
 
+pub mod admin;
 pub mod messages;
-
+pub mod models;
 /// Default base URL for the Anthropic API
 pub static DEFAULT_BASE_URL: LazyLock<String> =
     LazyLock::new(|| String::from("https://api.anthropic.com/v1/"));
@@ -75,7 +76,7 @@ impl Credentials {
     /// # Examples
     ///
     /// ```
-    /// use anthropic::Credentials;
+    /// use anthropic_api::Credentials;
     ///
     /// let credentials = Credentials::new("your-api-key", "");
     /// ```
@@ -103,7 +104,7 @@ impl Credentials {
     /// # Examples
     ///
     /// ```no_run
-    /// use anthropic::Credentials;
+    /// use anthropic_api::Credentials;
     ///
     /// // Assumes ANTHROPIC_API_KEY is set in the environment
     /// let credentials = Credentials::from_env();

@@ -21,7 +21,7 @@
 //!
 //! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
 
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
@@ -36,7 +36,7 @@ async fn main() {
     }];
 
     // Create initial message request with streaming
-    let mut stream = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let mut stream = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .create_stream()
         .await
@@ -75,12 +75,11 @@ async fn main() {
         });
 
         // Send message request with streaming
-        let mut stream =
-            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-                .credentials(credentials.clone())
-                .create_stream()
-                .await
-                .unwrap();
+        let mut stream = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+            .credentials(credentials.clone())
+            .create_stream()
+            .await
+            .unwrap();
 
         // Print assistant's streaming response and store the text
         print!("\nAssistant: ");

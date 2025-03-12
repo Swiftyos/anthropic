@@ -1,6 +1,6 @@
 [package]
-name = "anthropic-llm"
-version = "1.0.1"
+name = "anthropic-api"
+version = "0.0.1"
 authors = ["Craig Swift <craigswift13@gmail.com>", "swiftyos"]
 edition = "2021"
 description = "An unofficial Rust library for the Anthropic API."
@@ -37,3 +37,7 @@ path = "examples/streaming.rs"
 [[example]]
 name = "tool_use" 
 path = "examples/tool_use.rs"
+
+[[example]]
+name = "models"
+path = "examples/models.rs"

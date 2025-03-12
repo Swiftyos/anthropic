@@ -19,7 +19,7 @@
 //!
 //! Make sure you have set the `ANTHROPIC_API_KEY` environment variable.
 
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
@@ -35,7 +35,7 @@ async fn main() {
     }];
 
     // Create initial message request
-    let response = MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .create()
         .await
@@ -70,12 +70,11 @@ async fn main() {
         });
 
         // Send message request
-        let response =
-            MessageResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-                .credentials(credentials.clone())
-                .create()
-                .await
-                .unwrap();
+        let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+            .credentials(credentials.clone())
+            .create()
+            .await
+            .unwrap();
 
         // Print assistant's response
         if let Some(content) = response.content.first() {

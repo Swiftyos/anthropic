@@ -33,7 +33,7 @@ The library will automatically load this key when you create a `Credentials` obj
 Here’s a simple example of sending a message to the Anthropic API and receiving a response:
 
 ```rust
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 
 #[tokio::main]
 async fn main() {
@@ -86,7 +86,7 @@ Detailed examples can be found in the [`examples` directory](https://github.com/
 This example demonstrates a basic conversation loop with the Anthropic API:
 
 ```rust
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
@@ -98,7 +98,7 @@ async fn main() {
     }];
 
     // Initial message
-    let response = MessageResponse::builder("claude-3-sonnet-20240229", messages.clone(), 1024)
+    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .create()
         .await
@@ -124,7 +124,7 @@ async fn main() {
             content: MessageContent::Text(user_input),
         });
 
-        let response = MessageResponse::builder("claude-3-sonnet-20240229", messages.clone(), 1024)
+        let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
             .credentials(credentials.clone())
             .create()
             .await
@@ -146,7 +146,7 @@ async fn main() {
 This example shows how to use a calculator tool with the API:
 
 ```rust
-use anthropic_llm::{messages::*, Credentials};
+use anthropic_api::{messages::*, Credentials};
 use serde_json::json;
 
 #[tokio::main]
@@ -173,7 +173,7 @@ async fn main() {
     }];
 
     // Send message with tool
-    let response = MessageResponse::builder("claude-3-sonnet-20240229", messages.clone(), 1024)
+    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials)
         .tools(vec![calculator_tool])
         .tool_choice(ToolChoice::Any)
@@ -213,6 +213,23 @@ Run the test suite with:
 ```sh
 cargo test
 ```
+
+
+## Implementation Progress
+
+`██████████` Messages
+
+`░░░░░░░░░░` Batch Messages
+
+`██████████` Members
+
+`██████████` Invites
+
+`██████████` Workspaces
+
+`██████████` Workspace Members
+
+`██████████` API Keys
 
 ---
 

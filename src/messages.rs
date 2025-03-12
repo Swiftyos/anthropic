@@ -13,13 +13,13 @@
 //! ## Basic Usage
 //!
 //! ```no_run
-//! use anthropic::{messages::*, Credentials};
+//! use anthropic_api::{messages::*, Credentials};
 //!
 //! #[tokio::main]
 //! async fn main() {
 //!     let credentials = Credentials::from_env();
 //!
-//!     let response = MessageResponse::builder(
+//!     let response = MessagesAPI::builder(
 //!         "claude-3-7-sonnet-20250219",
 //!         vec![Message {
 //!             role: MessageRole::User,
@@ -51,7 +51,7 @@ use tokio::sync::mpsc::{channel, Receiver, Sender};
 /// This struct contains the complete response from a message request, including
 /// the model's generated content and usage statistics.
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
-pub struct MessageResponse {
+pub struct MessagesAPI {
     /// Unique identifier for this message
     pub id: String,
     /// The model that generated the response
@@ -340,7 +340,7 @@ pub struct Metadata {
 }
 
 // Implementation for non-streaming response
-impl MessageResponse {
+impl MessagesAPI {
     /// Creates a new message request and returns the response.
     ///
     /// This method sends a request to the Messages API and returns
@@ -349,7 +349,7 @@ impl MessageResponse {
     /// # Example
     ///
     /// ```no_run
-    /// # use anthropic::{messages::*, Credentials};
+    /// # use anthropic_api::{messages::*, Credentials};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
@@ -372,7 +372,7 @@ impl MessageResponse {
     ///     top_p: None,
     /// };
     ///
-    /// let response = MessageResponse::create(request).await?;
+    /// let response = MessagesAPI::create(request).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -392,7 +392,7 @@ impl StreamEvent {
     /// # Example
     ///
     /// ```no_run
-    /// # use anthropic::{messages::*, Credentials};
+    /// # use anthropic_api::{messages::*, Credentials};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
@@ -451,15 +451,12 @@ async fn forward_deserialized_anthropic_stream(
 ) -> anyhow::Result<()> {
     while let Some(event) = stream.next().await {
         let event = event?;
-        match event {
-            Event::Message(event) => {
-                let stream_event = serde_json::from_str::<StreamEvent>(&event.data)?;
-                if matches!(stream_event, StreamEvent::Ping) {
-                    continue; // Ignore ping events
-                }
-                tx.send(stream_event).await?;
+        if let Event::Message(event) = event {
+            let stream_event = serde_json::from_str::<StreamEvent>(&event.data)?;
+            if matches!(stream_event, StreamEvent::Ping) {
+                continue; // Ignore ping events
             }
-            _ => {}
+            tx.send(stream_event).await?;
         }
     }
     Ok(())
@@ -475,27 +472,22 @@ impl MessagesBuilder {
     /// # Example
     ///
     /// ```no_run
-    /// # use anthropic::{messages::*, Credentials};
+    /// # use anthropic_api::{messages::*, Credentials};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let response = MessagesBuilder::create_empty()
-    ///     .model("claude-3-7-sonnet-20250219")
-    ///     .messages(vec![Message {
-    ///         role: MessageRole::User,
-    ///         content: MessageContent::Text("Hello!".to_string()),
-    ///     }])
-    ///     .max_tokens(100)
-    ///     .credentials(credentials)
+    /// let response = MessagesAPI::builder("claude-3-7-sonnet-20250219",[], 1024)
+    ///     .credentials(credentials.clone())
     ///     .create()
-    ///     .await?;
+    ///     .await
+    ///     .unwrap();
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn create(self) -> ApiResponseOrError<MessageResponse> {
+    pub async fn create(self) -> ApiResponseOrError<MessagesAPI> {
         let request = self.build().unwrap();
-        MessageResponse::create(request).await
+        MessagesAPI::create(request).await
     }
 
     /// Creates a new streaming message request and returns a channel of events.
@@ -506,18 +498,12 @@ impl MessagesBuilder {
     /// # Example
     ///
     /// ```no_run
-    /// # use anthropic::{messages::*, Credentials};
+    /// # use anthropic_api::{messages::*, Credentials};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let mut stream = MessagesBuilder::create_empty()
-    ///     .model("claude-3-7-sonnet-20250219")
-    ///     .messages(vec![Message {
-    ///         role: MessageRole::User,
-    ///         content: MessageContent::Text("Hello!".to_string()),
-    ///     }])
-    ///     .max_tokens(100)
+    /// let mut stream = MessagesAPI::builder("claude-3-7-sonnet-20250219", [], 1024)
     ///     .credentials(credentials)
     ///     .create_stream()
     ///     .await?;
@@ -537,7 +523,7 @@ impl MessagesBuilder {
 }
 
 // Helper to create a builder with required fields
-impl MessageResponse {
+impl MessagesAPI {
     /// Creates a new builder with the required fields.
     ///
     /// This is a convenience method to create a builder with the
@@ -546,12 +532,12 @@ impl MessageResponse {
     /// # Example
     ///
     /// ```no_run
-    /// # use anthropic::{messages::*, Credentials};
+    /// # use anthropic_api::{messages::*, Credentials};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let response = MessageResponse::builder(
+    /// let response = MessagesAPI::builder(
     ///     "claude-3-7-sonnet-20250219",
     ///     vec![Message {
     ///         role: MessageRole::User,
@@ -585,7 +571,7 @@ mod tests {
     async fn test_simple_message() {
         let credentials = Credentials::from_env();
 
-        let response = MessageResponse::builder(
+        let response = MessagesAPI::builder(
             "claude-3-7-sonnet-20250219",
             vec![Message {
                 role: MessageRole::User,
@@ -605,7 +591,7 @@ mod tests {
     async fn test_streaming_message() {
         let credentials = Credentials::from_env();
 
-        let mut stream = MessageResponse::builder(
+        let mut stream = MessagesAPI::builder(
             "claude-3-7-sonnet-20250219",
             vec![Message {
                 role: MessageRole::User,
