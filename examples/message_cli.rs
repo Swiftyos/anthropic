@@ -35,12 +35,13 @@ async fn main() {
     }];
 
     // Create initial message request
-    let response = MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 2000)
+    let response = MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 2048)
         .credentials(credentials.clone())
-        .thinking(Thinking {
-            thinking_type: ThinkingType::Enabled,
-            budget_tokens: 1000,
-        })
+        // Uncomment this to enable thinking
+        // .thinking(Thinking {
+        //     thinking_type: ThinkingType::Enabled,
+        //     budget_tokens: 1024,
+        // })
         .create()
         .await
         .unwrap();

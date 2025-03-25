@@ -58,7 +58,7 @@ pub struct MessagesResponse {
     pub model: String,
     /// The role of the message sender (always Assistant for responses)
     pub role: MessageRole,
-    /// The content blocks in the response (text or tool use)
+    /// The content blocks in the response (text, tool use, thinking, redacted thinking)
     pub content: Vec<ResponseContentBlock>,
     /// Reason why the model stopped generating, if applicable
     pub stop_reason: Option<String>,
@@ -74,7 +74,7 @@ pub struct MessagesResponse {
 /// Content block in a response, can be text or tool use.
 ///
 /// Claude's responses can contain different types of content blocks.
-/// Currently, this can be either text or a tool use request.
+/// Currently, this can be either text, a tool use request, a thinking block, or a redacted thinking block.
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
 #[serde(tag = "type")]
 pub enum ResponseContentBlock {
@@ -88,6 +88,12 @@ pub enum ResponseContentBlock {
         name: String,
         input: Value,
     },
+    /// A thinking block from the model
+    #[serde(rename = "thinking")]
+    Thinking { signature: String, thinking: String },
+    /// A redacted thinking block from the model
+    #[serde(rename = "redacted_thinking")]
+    RedactedThinking { data: String },
 }
 
 /// Streaming events from the Anthropic API.
@@ -299,7 +305,6 @@ pub struct ImageSource {
 }
 
 #[derive(Serialize, Debug, Clone, Eq, PartialEq)]
-#[serde(tag = "type")]
 pub enum ThinkingType {
     /// Whether Claude is to use thinking
     #[serde(rename = "enabled")]
@@ -313,7 +318,8 @@ pub enum ThinkingType {
 pub struct Thinking {
     #[serde(rename = "type")]
     pub thinking_type: ThinkingType,
-    /// The budget for the thinking in tokens
+    /// The budget for the thinking in tokens must
+    /// be at least 1024 and less than max_tokens
     #[serde(rename = "budget_tokens")]
     pub budget_tokens: u64,
 }

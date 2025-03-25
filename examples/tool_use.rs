@@ -80,6 +80,15 @@ async fn main() {
             ResponseContentBlock::ToolUse { name, input, .. } => {
                 println!("Claude decided to use the tool: {}: {}", name, input);
             }
+            ResponseContentBlock::Thinking {
+                signature,
+                thinking,
+            } => {
+                println!("Claude {} is thinking: {}", signature, thinking);
+            }
+            ResponseContentBlock::RedactedThinking { data } => {
+                println!("Claude is thinking: {}", data);
+            }
         }
     }
 }
