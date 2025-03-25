@@ -59,7 +59,7 @@ async fn main() {
     println!("Claude: {}", content);
 
     // Create message request with tool
-    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .tools(vec![calculator_tool.clone()])
         .tool_choice(ToolChoice::Any)
