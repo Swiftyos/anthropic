@@ -35,8 +35,12 @@ async fn main() {
     }];
 
     // Create initial message request
-    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 2000)
         .credentials(credentials.clone())
+        .thinking(Thinking {
+            thinking_type: ThinkingType::Enabled,
+            budget_tokens: 1000,
+        })
         .create()
         .await
         .unwrap();
@@ -70,11 +74,12 @@ async fn main() {
         });
 
         // Send message request
-        let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
-            .credentials(credentials.clone())
-            .create()
-            .await
-            .unwrap();
+        let response =
+            MessagesResponse::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+                .credentials(credentials.clone())
+                .create()
+                .await
+                .unwrap();
 
         // Print assistant's response
         if let Some(content) = response.content.first() {

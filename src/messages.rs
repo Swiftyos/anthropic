@@ -19,7 +19,7 @@
 //! async fn main() {
 //!     let credentials = Credentials::from_env();
 //!
-//!     let response = MessagesAPI::builder(
+//!     let response =MessagesBuilder::builder(
 //!         "claude-3-7-sonnet-20250219",
 //!         vec![Message {
 //!             role: MessageRole::User,
@@ -51,7 +51,7 @@ use tokio::sync::mpsc::{channel, Receiver, Sender};
 /// This struct contains the complete response from a message request, including
 /// the model's generated content and usage statistics.
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
-pub struct MessagesAPI {
+pub struct MessagesResponse {
     /// Unique identifier for this message
     pub id: String,
     /// The model that generated the response
@@ -208,6 +208,9 @@ pub struct MessagesRequest {
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f64>,
+    #[builder(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thinking: Option<Thinking>,
     /// Tool choice specification.
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -295,6 +298,26 @@ pub struct ImageSource {
     pub data: String,
 }
 
+#[derive(Serialize, Debug, Clone, Eq, PartialEq)]
+#[serde(tag = "type")]
+pub enum ThinkingType {
+    /// Whether Claude is to use thinking
+    #[serde(rename = "enabled")]
+    Enabled,
+    /// Whether Claude is not to use thinking
+    #[serde(rename = "disabled")]
+    Disabled,
+}
+
+#[derive(Serialize, Debug, Clone, Eq, PartialEq)]
+pub struct Thinking {
+    #[serde(rename = "type")]
+    pub thinking_type: ThinkingType,
+    /// The budget for the thinking in tokens
+    #[serde(rename = "budget_tokens")]
+    pub budget_tokens: u64,
+}
+
 /// Tool definition.
 ///
 /// Tools allow Claude to perform actions outside its context,
@@ -340,7 +363,7 @@ pub struct Metadata {
 }
 
 // Implementation for non-streaming response
-impl MessagesAPI {
+impl MessagesResponse {
     /// Creates a new message request and returns the response.
     ///
     /// This method sends a request to the Messages API and returns
@@ -366,13 +389,14 @@ impl MessagesAPI {
     ///     stream: None,
     ///     system: None,
     ///     temperature: None,
+    ///     thinking: None,
     ///     tool_choice: None,
     ///     tools: None,
     ///     top_k: None,
     ///     top_p: None,
     /// };
     ///
-    /// let response = MessagesAPI::create(request).await?;
+    /// let response = MessagesResponse::create(request).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -409,6 +433,7 @@ impl StreamEvent {
     ///     stream: Some(true),
     ///     system: None,
     ///     temperature: None,
+    ///     thinking: None,
     ///     tool_choice: None,
     ///     tools: None,
     ///     top_k: None,
@@ -464,6 +489,13 @@ async fn forward_deserialized_anthropic_stream(
 
 // Builder convenience methods
 impl MessagesBuilder {
+    pub fn builder(model: &str, messages: impl Into<Vec<Message>>, max_tokens: u64) -> Self {
+        Self::create_empty()
+            .model(model)
+            .messages(messages)
+            .max_tokens(max_tokens)
+    }
+
     /// Creates a new message request and returns the response.
     ///
     /// This is a convenience method that builds the request from the builder
@@ -477,7 +509,7 @@ impl MessagesBuilder {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let response = MessagesAPI::builder("claude-3-7-sonnet-20250219",[], 1024)
+    /// let response =MessagesBuilder::builder("claude-3-7-sonnet-20250219",[], 1024)
     ///     .credentials(credentials.clone())
     ///     .create()
     ///     .await
@@ -485,9 +517,9 @@ impl MessagesBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn create(self) -> ApiResponseOrError<MessagesAPI> {
+    pub async fn create(self) -> ApiResponseOrError<MessagesResponse> {
         let request = self.build().unwrap();
-        MessagesAPI::create(request).await
+        MessagesResponse::create(request).await
     }
 
     /// Creates a new streaming message request and returns a channel of events.
@@ -503,7 +535,7 @@ impl MessagesBuilder {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let mut stream = MessagesAPI::builder("claude-3-7-sonnet-20250219", [], 1024)
+    /// let mut stream =MessagesBuilder::builder("claude-3-7-sonnet-20250219", [], 1024)
     ///     .credentials(credentials)
     ///     .create_stream()
     ///     .await?;
@@ -523,7 +555,7 @@ impl MessagesBuilder {
 }
 
 // Helper to create a builder with required fields
-impl MessagesAPI {
+impl MessagesResponse {
     /// Creates a new builder with the required fields.
     ///
     /// This is a convenience method to create a builder with the
@@ -537,7 +569,7 @@ impl MessagesAPI {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let credentials = Credentials::from_env();
     ///
-    /// let response = MessagesAPI::builder(
+    /// let response =MessagesBuilder::builder(
     ///     "claude-3-7-sonnet-20250219",
     ///     vec![Message {
     ///         role: MessageRole::User,
@@ -571,7 +603,7 @@ mod tests {
     async fn test_simple_message() {
         let credentials = Credentials::from_env();
 
-        let response = MessagesAPI::builder(
+        let response = MessagesResponse::builder(
             "claude-3-7-sonnet-20250219",
             vec![Message {
                 role: MessageRole::User,
@@ -591,7 +623,7 @@ mod tests {
     async fn test_streaming_message() {
         let credentials = Credentials::from_env();
 
-        let mut stream = MessagesAPI::builder(
+        let mut stream = MessagesResponse::builder(
             "claude-3-7-sonnet-20250219",
             vec![Message {
                 role: MessageRole::User,

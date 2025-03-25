@@ -51,7 +51,7 @@ async fn main() {
     }];
 
     // Send the message to the Anthropic API
-    let response = MessageResponse::builder("claude-3-sonnet-20240229", messages, 1024)
+    let response = MessageBuilder::builder("claude-3-sonnet-20240229", messages, 1024)
         .credentials(credentials)
         .create()
         .await
@@ -102,7 +102,7 @@ async fn main() {
     }];
 
     // Initial message
-    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials.clone())
         .create()
         .await
@@ -128,7 +128,7 @@ async fn main() {
             content: MessageContent::Text(user_input),
         });
 
-        let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+        let response =MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
             .credentials(credentials.clone())
             .create()
             .await
@@ -177,7 +177,7 @@ async fn main() {
     }];
 
     // Send message with tool
-    let response = MessagesAPI::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
+    let response = MessagesBuilder::builder("claude-3-7-sonnet-20250219", messages.clone(), 1024)
         .credentials(credentials)
         .tools(vec![calculator_tool])
         .tool_choice(ToolChoice::Any)
