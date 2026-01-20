@@ -49,7 +49,7 @@ async fn main() {
     while let Some(event) = stream.recv().await {
         match event {
             StreamEvent::ContentBlockDelta { delta, .. } => {
-                if let ContentBlockDelta::Text { text } = delta {
+                if let ContentBlockDelta::TextDelta { text } = delta {
                     print!("{}", text);
                     stdout().flush().unwrap();
                 }
@@ -90,7 +90,7 @@ async fn main() {
         while let Some(event) = stream.recv().await {
             match event {
                 StreamEvent::ContentBlockDelta { delta, .. } => {
-                    if let ContentBlockDelta::Text { text } = delta {
+                    if let ContentBlockDelta::TextDelta { text } = delta {
                         print!("{}", text);
                         stdout().flush().unwrap();
                         full_response.push_str(&text);

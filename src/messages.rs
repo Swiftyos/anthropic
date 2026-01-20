@@ -147,11 +147,16 @@ pub struct MessageStart {
 
 /// Initial content block in a streaming response.
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum ContentBlockStart {
     /// A text content block
+    #[serde(rename = "text")]
     Text { text: String },
+    /// A thinking content block (extended thinking)
+    #[serde(rename = "thinking")]
+    Thinking { thinking: String },
     /// A tool use request
+    #[serde(rename = "tool_use")]
     ToolUse {
         id: String,
         name: String,
@@ -161,11 +166,16 @@ pub enum ContentBlockStart {
 
 /// Incremental update to a content block in a streaming response.
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum ContentBlockDelta {
     /// Text delta for a text content block
-    Text { text: String },
+    #[serde(rename = "text_delta")]
+    TextDelta { text: String },
+    /// Thinking delta for a thinking content block
+    #[serde(rename = "thinking_delta")]
+    ThinkingDelta { thinking: String },
     /// JSON delta for a tool use input
+    #[serde(rename = "input_json_delta")]
     InputJsonDelta { partial_json: String },
 }
 
@@ -278,7 +288,8 @@ pub enum MessageContent {
 
 /// Content block in a request.
 ///
-/// Request content blocks can be either text or images.
+/// Request content blocks can be text, images, tool use (from assistant messages),
+/// or tool results (for agentic loops).
 #[derive(Serialize, Debug, Clone, Eq, PartialEq)]
 #[serde(tag = "type")]
 pub enum RequestContentBlock {
@@ -288,6 +299,27 @@ pub enum RequestContentBlock {
     /// An image content block
     #[serde(rename = "image")]
     Image { source: ImageSource },
+    /// A tool use content block (from assistant messages, needed for multi-turn agentic loops)
+    #[serde(rename = "tool_use")]
+    ToolUse {
+        /// The unique ID of this tool use
+        id: String,
+        /// The name of the tool being used
+        name: String,
+        /// The input parameters for the tool
+        input: Value,
+    },
+    /// A tool result content block (for returning tool execution results to the model)
+    #[serde(rename = "tool_result")]
+    ToolResult {
+        /// The ID of the tool_use request this is a result for
+        tool_use_id: String,
+        /// The result content (text or structured data as string)
+        content: String,
+        /// Whether this result represents an error
+        #[serde(skip_serializing_if = "Option::is_none")]
+        is_error: Option<bool>,
+    },
 }
 
 /// Source of an image content block.
@@ -481,13 +513,29 @@ async fn forward_deserialized_anthropic_stream(
     tx: Sender<StreamEvent>,
 ) -> anyhow::Result<()> {
     while let Some(event) = stream.next().await {
-        let event = event?;
+        let event = match event {
+            Ok(e) => e,
+            Err(e) => {
+                eprintln!("[anthropic-api] Stream event error: {:?}", e);
+                return Err(e.into());
+            }
+        };
         if let Event::Message(event) = event {
-            let stream_event = serde_json::from_str::<StreamEvent>(&event.data)?;
+            let stream_event = match serde_json::from_str::<StreamEvent>(&event.data) {
+                Ok(e) => e,
+                Err(e) => {
+                    eprintln!("[anthropic-api] Failed to deserialize stream event: {}", e);
+                    eprintln!("[anthropic-api] Raw data: {}", event.data);
+                    return Err(e.into());
+                }
+            };
             if matches!(stream_event, StreamEvent::Ping) {
                 continue; // Ignore ping events
             }
-            tx.send(stream_event).await?;
+            if let Err(e) = tx.send(stream_event).await {
+                eprintln!("[anthropic-api] Failed to send stream event: {}", e);
+                return Err(e.into());
+            }
         }
     }
     Ok(())
@@ -645,7 +693,7 @@ mod tests {
         while let Some(event) = stream.recv().await {
             match event {
                 StreamEvent::ContentBlockDelta { delta, .. } => {
-                    if let ContentBlockDelta::Text { text } = delta {
+                    if let ContentBlockDelta::TextDelta { text } = delta {
                         print!("{}", text);
                     }
                 }
